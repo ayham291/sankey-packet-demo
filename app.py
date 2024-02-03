@@ -1,5 +1,5 @@
 import time
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from scapy.all import sniff, IP, TCP
 from threading import Thread
 import json
@@ -50,6 +50,10 @@ def get_packet_data():
     global packets_info
     data = json.dumps(packets_info)  # Convert packet data to JSON
     return jsonify(data)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 if __name__ == '__main__':
     Thread(target=capture_packets).start()  # Start packet capture in a separate thread
