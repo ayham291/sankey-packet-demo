@@ -11,6 +11,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 packets_info = []  # Store packet data
+net_interface = os.popen("ip -o -f inet addr show | awk '/172.20.0.*\/16/ {print $2}'").read().strip()
 
 def process_packet(packet):
     # Extract packet data
@@ -35,7 +36,6 @@ def process_packet(packet):
 
 def capture_packets():
     # get the network name from stdin and store it in a variable
-    net_interface = os.popen('getDockerNetwork nginx-stream-tls-example_default').read().strip()
     print(f'Capturing packets on {net_interface}')
 
     # Capture packets
@@ -57,13 +57,18 @@ def get_packet_data():
     data = json.dumps(packets_info)  # Convert packet data to JSON
     return jsonify(data)
 
+@app.route('/interface', methods=['GET'])
+def interface_name():
+    return net_interface
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
     Thread(target=capture_packets).start()  # Start packet capture in a separate thread
-    # Reset packet data every 30 seconds
+    # Reset packet data
     Thread(target=reset_packet_data).start()
     app.run(host='0.0.0.0', port=5000)
 

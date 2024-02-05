@@ -7,8 +7,16 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
+    <p id="iface"></p>
     <div id="sankeyDiagram"></div>
     <script>
+      fetch('/interface')
+          .then(response => response.text())
+          .then(data => {
+              document.getElementById('iface').innerText = `Monitoring network interface: ${data}`;
+          })
+          .catch(error => console.error('Error fetching data:', error));
+
       function updateSankey() {
           fetch('/get_packet_data')
               .then(response => response.json())
