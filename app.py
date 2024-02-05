@@ -14,18 +14,24 @@ packets_info = []  # Store packet data
 
 def process_packet(packet):
     # Extract packet data
+    # if destination ip is not a previous source ip
     if IP in packet and TCP in packet:
-        tcp_flags = packet[TCP].flags
-        if 'S' in tcp_flags and 'A' not in tcp_flags:
-            packet_data = {
-                "src": packet[IP].src,
-                "dst": packet[IP].dst,
-                "proto": packet[IP].proto,
-                "len": len(packet)
-            }
-            packets_info.append(packet_data)
-            # print(packet_data)
-            # print(packet)
+        if packet[IP].dst in [packet['src'] for packet in packets_info]:
+            return
+        packet_data = {
+            "src": packet[IP].src,
+            "dst": packet[IP].dst,
+            "proto": packet[IP].proto,
+            "sport": packet[TCP].sport,
+            "dport": packet[TCP].dport,
+            "flags": f'{packet[TCP].flags}',
+            "len": len(packet),
+            # hostnames
+            "hostname": os.popen(f'getent hosts {packet[IP].src}').read().strip(),
+        }
+        packets_info.append(packet_data)
+        print(packet_data)
+        # print(packet)
 
 def capture_packets():
     # get the network name from stdin and store it in a variable
@@ -34,8 +40,8 @@ def capture_packets():
 
     # Capture packets
     t = sniff(iface=net_interface, count=1500, prn=process_packet)
-    print(t.summary())
-    print('Packet capture stopped')
+    # print(t.summary())
+    # print('Packet capture stopped')
 
 def reset_packet_data():
     # Reset packet data every 30 seconds
@@ -58,6 +64,6 @@ def index():
 if __name__ == '__main__':
     Thread(target=capture_packets).start()  # Start packet capture in a separate thread
     # Reset packet data every 30 seconds
-    # Thread(target=reset_packet_data).start()
+    Thread(target=reset_packet_data).start()
     app.run(host='0.0.0.0', port=5000)
 
