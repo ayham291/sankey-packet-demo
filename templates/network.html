@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Network Visualization</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div id="networkGraph" style="width:100%;height:600px;"></div>
+
+    <script>
+      function loadNetworkGraph() {
+        document.addEventListener("DOMContentLoaded", function() {
+            const liveHosts = {{ live_hosts|tojson }};
+            const nodeXs = [];
+            const nodeYs = [];
+            const nodeText = [];
+
+            // Calculate positions for each live host node in a circle around the central node
+            const radius = 1;  // Radius of the circle
+            const centralNode = {x: 0, y: 0};  // Position of the central node
+            liveHosts.forEach((host, index) => {
+                const angle = (index / liveHosts.length) * 2 * Math.PI;  // Angle for each node
+                const x = centralNode.x + radius * Math.cos(angle);
+                const y = centralNode.y + radius * Math.sin(angle);
+                nodeXs.push(x);
+                nodeYs.push(y);
+                nodeText.push(host);
+            });
+
+            const data = [{
+                type: 'scatter',
+                x: nodeXs,
+                y: nodeYs,
+                mode: 'markers+text',
+                marker: { size: 15 },
+                text: nodeText,
+                textposition: 'top center'
+            }];
+
+            const layout = {
+                title: 'Live Hosts in Network',
+                hovermode: 'closest',
+                xaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                    showticklabels: false
+                },
+                yaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                    showticklabels: false
+                },
+                showlegend: false
+            };
+
+            Plotly.newPlot('networkGraph', data, layout);
+        });
+      }
+
+      loadNetworkGraph();
+
+      setInterval(loadNetworkGraph, 1000);
+    </script>
+</body>
+</html>
