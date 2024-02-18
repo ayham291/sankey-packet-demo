@@ -111,8 +111,8 @@ if __name__ == '__main__':
 
     all_ips = [ip for ip in ipaddress.IPv4Network(subnet, strict=False)]
 
-    # Thread(target=capture_packets).start()  # Start packet capture in a separate thread
+    Thread(target=capture_packets).start()  # Start packet capture in a separate thread
     # # Reset packet data
-    # Thread(target=reset_packet_data).start()
+    Thread(target=reset_packet_data).start()
     app.run(host='0.0.0.0', port=5000)
 
