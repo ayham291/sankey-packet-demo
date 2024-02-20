@@ -64,6 +64,12 @@ def capture_packets():
     # print(t.summary())
     # print('Packet capture stopped')
 
+@app.route('/reset_packets', methods=['GET'])
+def reset_packets():
+    global packets_info
+    packets_info = []
+    return jsonify('Packet data reset')
+
 def reset_packet_data():
     # Reset packet data every 30 seconds
     while True:
@@ -112,7 +118,7 @@ if __name__ == '__main__':
     all_ips = [ip for ip in ipaddress.IPv4Network(subnet, strict=False)]
 
     Thread(target=capture_packets).start()  # Start packet capture in a separate thread
-    # # Reset packet data
-    Thread(target=reset_packet_data).start()
+    # Reset packet data
+    # Thread(target=reset_packet_data).start()
     app.run(host='0.0.0.0', port=5000)
 

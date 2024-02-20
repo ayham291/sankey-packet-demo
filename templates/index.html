@@ -8,6 +8,8 @@
 </head>
 <body>
     <p id="iface"></p>
+    <!-- reset packets on with reset_packets endpoint -->
+    <button onclick="fetch('/reset_packets', { method: 'GET' })">Reset Packets</button>
     <div id="sankeyDiagram"></div>
     <script>
       fetch('/interface')
